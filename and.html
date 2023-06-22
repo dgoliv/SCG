@@ -52,10 +52,12 @@
     const adicionarTarefaBtn = document.getElementById('adicionarTarefa');
     const listaTarefas = document.getElementById('listaTarefas');
 
-    // Verifica se há dados no localStorage e carrega os títulos salvos
-    const titulosSalvos = localStorage.getItem('titulos');
-    if (titulosSalvos) {
-      listaTitulos.innerHTML = titulosSalvos;
+    // Verifica se há dados no localStorage e carrega os títulos e tarefas salvos
+    const dataSalva = localStorage.getItem('dados');
+    if (dataSalva) {
+      const { titulos, tarefas } = JSON.parse(dataSalva);
+      listaTitulos.innerHTML = titulos;
+      listaTarefas.innerHTML = tarefas;
     }
 
     adicionarTituloBtn.addEventListener('click', adicionarTitulo);
@@ -72,8 +74,8 @@
 
         tituloInput.value = '';
 
-        // Salva os títulos no localStorage
-        localStorage.setItem('titulos', listaTitulos.innerHTML);
+        // Salva os dados no localStorage
+        salvarDados();
       }
     }
 
@@ -90,8 +92,25 @@
 
         dataInput.value = '';
         descricaoInput.value = '';
+
+        // Salva os dados no localStorage
+        salvarDados();
       }
+    }
+
+    function salvarDados() {
+      const titulos = listaTitulos.innerHTML;
+      const tarefas = listaTarefas.innerHTML;
+
+      const data = {
+        titulos,
+        tarefas
+      };
+
+      // Armazena os dados no localStorage
+      localStorage.setItem('dados', JSON.stringify(data));
     }
   </script>
 </body>
 </html>
+``
