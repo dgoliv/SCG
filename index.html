@@ -149,8 +149,8 @@
   </form>
  <div>
   <label for="status-radio">Status:</label>
-  <input type="radio" name="status" value="received" onchange="filterByStatus(true)" checked>Recebidas
-  <input type="radio" name="status" value="not-received" onchange="filterByStatus(false)">Não Recebidas
+  <input type="radio" name="status" value="received" onchange="filterByStatus(true)" checked> Recebidas 
+  <input type="radio" name="status" value="not-received" onchange="filterByStatus(false)"> Não Recebidas 
 </div>
 
 
@@ -369,6 +369,33 @@
       const filteredTitle = filteredTitleSelect.value.trim();
 
       renderTasks();
+       // Verifica se há tarefas armazenadas no LocalStorage
+    if (localStorage.getItem('tasks')) {
+      tasks = JSON.parse(localStorage.getItem('tasks'));
+    }
+
+    // Verifica se há títulos armazenados no LocalStorage
+    if (localStorage.getItem('titles')) {
+      titles = JSON.parse(localStorage.getItem('titles'));
+    }
+
+    // Função para atualizar as tarefas no LocalStorage
+    function updateLocalStorage() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Função para atualizar os títulos no LocalStorage
+    function updateTitleLocalStorage() {
+      localStorage.setItem('titles', JSON.stringify(titles));
+    }
+
+    // Função para adicionar um novo título à lista suspensa
+    function addNewTitle() {
+      // Lógica do código para adicionar um novo título
+
+      // Atualiza o LocalStorage
+      updateTitleLocalStorage();
+    }
     }
   </script>
 </body>
