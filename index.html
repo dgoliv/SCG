@@ -52,10 +52,15 @@
     const adicionarTarefaBtn = document.getElementById('adicionarTarefa');
     const listaTarefas = document.getElementById('listaTarefas');
 
-    // Verifica se há dados no localStorage e carrega os títulos salvos
+    // Verifica se há dados no localStorage e carrega os títulos e tarefas salvos
     const titulosSalvos = localStorage.getItem('titulos');
     if (titulosSalvos) {
       listaTitulos.innerHTML = titulosSalvos;
+    }
+
+    const tarefasSalvas = localStorage.getItem('tarefas');
+    if (tarefasSalvas) {
+      listaTarefas.innerHTML = tarefasSalvas;
     }
 
     adicionarTituloBtn.addEventListener('click', adicionarTitulo);
@@ -90,6 +95,9 @@
 
         dataInput.value = '';
         descricaoInput.value = '';
+
+        // Salva as tarefas no localStorage
+        localStorage.setItem('tarefas', listaTarefas.innerHTML);
       }
     }
   </script>
