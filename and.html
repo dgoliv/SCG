@@ -1,116 +1,232 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Lista de Tarefas</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+    
     .container {
-      margin: 20px auto;
-      width: 300px;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-
-    input[type="text"], select {
-      display: block;
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    
+    form {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+    
+    input[type="text"], textarea, input[type="date"], input[type="submit"] {
       margin-bottom: 10px;
-      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
     }
-
-    button {
-      display: block;
-      margin-bottom: 10px;
+    
+    input[type="submit"] {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
     }
-
+    
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    
     ul {
       list-style-type: none;
       padding: 0;
     }
-
+    
     li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
+      border-radius: 4px;
+      background-color: #f2f2f2;
+      padding: 10px;
+      transition: background-color 0.3s;
+    }
+    
+    li:last-child {
+      border-bottom: none;
+    }
+    
+    .task-description {
+      white-space: pre-line;
+    }
+    
+    .task-actions button {
+      padding: 6px 12px;
+      border: none;
+      background-color: transparent;
+      color: #888;
+      cursor: pointer;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .task-actions button:hover {
+      color: #555;
+    }
+    
+    li.completed {
+      background-color: #e0f2e9;
+    }
+    
+    li.completed span {
+      text-decoration: line-through;
+      color: #888;
+    }
+    
+    .task-details {
+      display: flex;
+      align-items: center;
+    }
+    
+    .task-details > * {
+      margin-right: 110px;
+    }
+    
+    .task-details span.task-date {
+      font-size: 14px;
+      color: #888;
+    }
+
+    /* Adicione o espaçamento entre as informações */
+    .task-details span {
+      margin-bottom: 5px;
+    }
+    
+    .task-details span.task-date {
+      margin-left: auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Cadastro de Tarefas</h2>
-    <input type="text" id="tituloInput" placeholder="Cadastro de Título">
-    <button id="adicionarTitulo">Adicionar</button>
-
-    <select id="listaTitulos"></select>
-
-    <input type="date" id="dataInput" placeholder="Data">
-
-    <input type="text" id="descricaoInput" placeholder="Descrição">
-    <button id="adicionarTarefa">Adicionar</button>
-
-    <h2>Lista de Tarefas</h2>
-    <ul id="listaTarefas"></ul>
+    <h1>Lista de Tarefas</h1>
+  
+    <form id="taskForm">
+      <input type="text" id="taskTitle" placeholder="Título" required>
+      <textarea id="taskDescription" placeholder="Descrição" rows="4" required></textarea>
+      <input type="date" id="taskDate" required>
+      <input type="submit" value="Adicionar">
+    </form>
+  
+    <ul id="taskList"></ul>
+    
+    <script>
+      // Verificar se há tarefas armazenadas no localStorage
+      let tasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
+      
+      // Função para exibir as tarefas na lista
+      function renderTasks() {
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = '';
+        
+        tasks.forEach(function(task, index) {
+          const listItem = document.createElement('li');
+          listItem.className = task.completed ? 'completed' : '';
+          listItem.innerHTML = `
+            <div class="task-details">
+              <span>${task.title}</span>
+              <span class="task-description">${task.description}</span>
+              <span class="task-date">${task.date}</span>
+            </div>
+            <div class="task-actions">
+              <button onclick="editTask(${index})">Editar</button>
+              <button onclick="deleteTask(${index})">Excluir</button>
+            </div>
+          `;
+          
+          taskList.appendChild(listItem);
+        });
+      }
+      
+      // Função para adicionar uma nova tarefa
+      function addTask(event) {
+        event.preventDefault();
+        
+        const title = document.getElementById('taskTitle').value;
+        const description = document.getElementById('taskDescription').value;
+        const date = document.getElementById('taskDate').value;
+        
+        const newTask = {
+          title: title,
+          description: description,
+          date: date,
+          completed: false
+        };
+        
+        tasks.push(newTask);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        
+        renderTasks();
+        resetForm();
+      }
+      
+      // Função para editar uma tarefa
+      function editTask(index) {
+        const listItem = document.getElementById('taskList').children[index];
+        const taskData = listItem.getElementsByTagName('span');
+        const title = taskData[0].textContent;
+        const description = taskData[1].textContent;
+        const date = taskData[2].textContent;
+        
+        document.getElementById('taskTitle').value = title;
+        document.getElementById('taskDescription').value = description;
+        document.getElementById('taskDate').value = date;
+        
+        tasks.splice(index, 1);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        
+        renderTasks();
+      }
+      
+      // Função para excluir uma tarefa
+      function deleteTask(index) {
+        tasks.splice(index, 1);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        renderTasks();
+      }
+      
+      // Função para limpar o formulário
+      function resetForm() {
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDescription').value = '';
+        document.getElementById('taskDate').value = '';
+      }
+      
+      // Event listener para o formulário de adicionar tarefas
+      document.getElementById('taskForm').addEventListener('submit', addTask);
+      
+      // Exibir as tarefas ao carregar a página
+      renderTasks();
+    </script>
   </div>
-
-  <script>
-    const adicionarTituloBtn = document.getElementById('adicionarTitulo');
-    const listaTitulos = document.getElementById('listaTitulos');
-    const adicionarTarefaBtn = document.getElementById('adicionarTarefa');
-    const listaTarefas = document.getElementById('listaTarefas');
-
-    // Verifica se há dados no localStorage e carrega os títulos e tarefas salvos
-    const dataSalva = localStorage.getItem('dados');
-    if (dataSalva) {
-      const { titulos, tarefas } = JSON.parse(dataSalva);
-      listaTitulos.innerHTML = titulos;
-      listaTarefas.innerHTML = tarefas;
-    }
-
-    adicionarTituloBtn.addEventListener('click', adicionarTitulo);
-    adicionarTarefaBtn.addEventListener('click', adicionarTarefa);
-
-    function adicionarTitulo() {
-      const tituloInput = document.getElementById('tituloInput');
-      const titulo = tituloInput.value;
-
-      if (titulo !== '') {
-        const option = document.createElement('option');
-        option.text = titulo;
-        listaTitulos.add(option);
-
-        tituloInput.value = '';
-
-        // Salva os dados no localStorage
-        salvarDados();
-      }
-    }
-
-    function adicionarTarefa() {
-      const tituloSelecionado = listaTitulos.value;
-      const dataInput = document.getElementById('dataInput');
-      const descricaoInput = document.getElementById('descricaoInput');
-
-      if (tituloSelecionado !== '') {
-        const li = document.createElement('li');
-        li.innerHTML = `<strong>${tituloSelecionado}</strong> - ${dataInput.value} - ${descricaoInput.value}`;
-
-        listaTarefas.appendChild(li);
-
-        dataInput.value = '';
-        descricaoInput.value = '';
-
-        // Salva os dados no localStorage
-        salvarDados();
-      }
-    }
-
-    function salvarDados() {
-      const titulos = listaTitulos.innerHTML;
-      const tarefas = listaTarefas.innerHTML;
-
-      const data = {
-        titulos,
-        tarefas
-      };
-
-      // Armazena os dados no localStorage
-      localStorage.setItem('dados', JSON.stringify(data));
-    }
-  </script>
 </body>
 </html>
-``
